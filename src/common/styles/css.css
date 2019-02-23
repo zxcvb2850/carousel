@@ -1,0 +1,6 @@
+h2{
+    display: flex;
+    background-image: url('../../assets/img/img.png');
+    color: #F00;
+    transition: all 0.35s;
+}
