@@ -9,12 +9,13 @@
         height: 300px;
         background-color: #abcdef;
         border: 1px solid #F00;
+        overflow: hidden;
 
         .swiper-wrapper{
             position: absolute;
             top: 0;
-            left: 0;
-            width: 3000px;
+            left: -600px;
+            width: 4200px;
 
             .swiper-slide{
                 float: left;
@@ -42,7 +43,28 @@
                 height: 20px;
                 background-color: #FFF;
                 border-radius: 50%;
+                text-align: center;
+                line-height: 20px;
+
+                &.active{
+                    background-color: #F00;
+                    color: #FFF;
+                }
             }
+        }
+
+        .swiper-button-prev, .swiper-button-next{
+            position: absolute;
+            top: 0;
+            width: 20px;
+            height: 100%;
+            background-color: #F00;
+        }
+        .swiper-button-prev{
+            left: 0;
+        }
+        .swiper-button-next{
+            right: 0;   
         }
     }
 }

@@ -1,6 +1,7 @@
 const Uglify = require('uglifyjs-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = [
     new Uglify(),
@@ -13,5 +14,9 @@ module.exports = [
         hash: true,
         template: './index.html'
     }),
+    new CopyPlugin([{
+        from: './static/',
+        to: './static/'
+    }]),
     new ExtractTextPlugin("static/styles/styles.css")
 ]
