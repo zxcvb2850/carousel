@@ -1,11 +1,22 @@
 import "./common/styles/index.less"
 
 const container = document.querySelector(".swiper-container")
+const containerWidth = container.clientWidth
 const swiperWrapper = document.querySelector(".swiper-wrapper")
+const swiperSlideItem = document.querySelectorAll(".swiper-slide")
 const swiperBullet = document.querySelectorAll(".swiper-pagination-bullet")
 const swiperPagination = document.querySelector(".swiper-pagination")
 const swiperPrev = document.querySelector(".swiper-button-prev")
 const swiperNext = document.querySelector(".swiper-button-next")
+
+const len = swiperSlideItem.length - 2
+const itemDom = Array.prototype.slice.apply(swiperSlideItem)
+itemDom.forEach(item => {
+  item.style.width = containerWidth + "px"
+})
+swiperWrapper.style.left = -containerWidth + "px"
+swiperWrapper.style.width = containerWidth * (len + 2) + "px"
+const itemWidth = swiperSlideItem[0].clientWidth
 let isAnimation = false
 let index = 1
 let time = null
@@ -37,10 +48,10 @@ function animation(offset) {
       requestAnimationFrame(go)
     } else {
       isAnimation = false
-      if (newLeft < -2400) {
-        swiperWrapper.style.left = "0px"
-      } else if (newLeft > -600) {
-        swiperWrapper.style.left = "-3000px"
+      if (newLeft < -len * itemWidth) {
+        swiperWrapper.style.left = `-${itemWidth}px`
+      } else if (newLeft > -itemWidth) {
+        swiperWrapper.style.left = `-${len * itemWidth}px`
       } else {
         swiperWrapper.style.left = newLeft + "px"
       }
@@ -59,21 +70,28 @@ swiperNext.addEventListener("click", () => {
 })
 function direction(type = "next") {
   if (!isAnimation) {
-    console.log(type)
     if (type === "next") {
-      index === 5 ? index = 1 : index++
+      index === len ? index = 1 : index++
     } else {
-      index === 1 ? index = 5 : index--
+      index === 1 ? index = len : index--
     }
     showBtn()
-    animation(type === "next" ? -600 : 600)
+    animation(type === "next" ? -itemWidth : itemWidth)
   }
 }
 
 swiperPagination.addEventListener("click", (e) => {
   const num = Number(e.target.innerText)
-  if (index !== num) {
-    animation(-600 * (num - index))
+  if (!isAnimation && Number(num) && index !== num) {
+    if (index === 1 || index === len) {
+      if (Math.abs(num - index) === len - 1) {
+        animation(-itemWidth * (len - num - index) * ((num - index) > 0 ? 1 : -1))
+      } else {
+        animation(-itemWidth * (num - index))
+      }
+    } else {
+      animation(-itemWidth * (num - index))
+    }
     index = num
     showBtn()
   }
@@ -82,3 +100,11 @@ swiperPagination.addEventListener("click", (e) => {
 play()
 container.onmouseenter = stop
 container.onmouseleave = play
+
+container.addEventListener("touchstart", (e) => {
+  console.log(e)
+})
+
+container.addEventListener("touchend", (e) => {
+  console.log(e)
+})
