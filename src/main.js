@@ -47,7 +47,6 @@ function animation(offset) {
       swiperWrapper.style.left = Number(swiperWrapper.offsetLeft) + speed + "px"
       requestAnimationFrame(go)
     } else {
-      isAnimation = false
       if (newLeft < -len * itemWidth) {
         swiperWrapper.style.left = `-${itemWidth}px`
       } else if (newLeft > -itemWidth) {
@@ -55,6 +54,7 @@ function animation(offset) {
       } else {
         swiperWrapper.style.left = newLeft + "px"
       }
+      isAnimation = false
     }
   }
 
@@ -76,7 +76,7 @@ function direction(type = "next") {
       index === 1 ? index = len : index--
     }
     showBtn()
-    animation(type === "next" ? -itemWidth : itemWidth)
+    animation(type === "next" ? itemWidth * -1 : itemWidth)
   }
 }
 
@@ -98,13 +98,43 @@ swiperPagination.addEventListener("click", (e) => {
 })
 
 play()
-container.onmouseenter = stop
-container.onmouseleave = play
+// container.onmouseenter = stop
+// container.onmouseleave = play
 
+let startX, endX, startLeft
 container.addEventListener("touchstart", (e) => {
-  console.log(e)
+  if (!isAnimation) {
+    stop()
+    const touch = e.targetTouches[0]
+    startX = touch.pageX
+    startLeft = swiperWrapper.offsetLeft
+  }
+})
+
+container.addEventListener("touchmove", (e) => {
+  if (startX && !isAnimation) {
+    const touch = e.targetTouches[0]
+    endX = touch.pageX
+    swiperWrapper.style.left = startLeft + endX - startX + "px"
+  }
 })
 
 container.addEventListener("touchend", (e) => {
-  console.log(e)
+  if (!isAnimation && (endX - startX)) {
+    const move = swiperWrapper.offsetLeft - startLeft
+    if (Math.abs(move) > (itemWidth / 3)) {
+      const width = (itemWidth) - Math.abs((endX - startX))
+      animation((endX - startX) > 0 ? width : width * -1)
+      if (endX - startX > 0) {
+        index === 1 ? index = len : index--
+      } else {
+        index === len ? index = 1 : index++
+      }
+      showBtn()
+    } else {
+      animation(-(endX - startX))
+    }
+    startX = endX = startLeft = null
+    play()
+  }
 })
