@@ -26,8 +26,8 @@ function prefixStyle(style) {
   if (!vnode) return false
 
   if (vnode === "standard") {
-    if (style === "transformEnd") {
-      return "transformEnd"
+    if (style === "transitionEnd") {
+      return "transitionend"
     }
     return style
   }

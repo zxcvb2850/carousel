@@ -1,13 +1,13 @@
 import Swiper from "./Swiper"
 import "./common/styles/index.less"
 
-const swiper = new Swiper(".swiper-container", {
-  // loop: false,
+new Swiper(".swiper-container", {
+  loop: false,
+  autoPlay: true,
+  speed: 3000,
   click: true,
   isArrow: true,
   css: false,
   isPaginat: true,
   swiperWrapClass: "swiper-wrapper"
 })
-
-console.log(swiper)

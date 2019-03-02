@@ -1,9 +1,13 @@
 import { hasTransition, style } from "../utils/dom"
-import { className } from "../utils/env"
+import { className, isAndroid, isIos } from "../utils/env"
 
 const DEFAULT_OPTIONS = {
   /* 是否循环播放 */
   loop: true,
+  /* 是否自动轮播 */
+  autoPlay: true,
+  /* 自动轮播时间 */
+  speed: 3000,
   /* 是否使用trans */
   css: true,
   /* 能否点击轮播 */
@@ -22,51 +26,61 @@ const DEFAULT_OPTIONS = {
 
 export default (Swiper) => {
   // 初始化之前设置
-  Swiper.prototype._init = function(options) {
+  Swiper.prototype._init = function (options) {
+    const _this = this
     let startX, endX, startLeft
-    this.ele.addEventListener("touchstart", (e) => {
-      console.log(e.targetTouches[0], this._isAnimation)
-      if (!this._isAnimation) {
-        // stop()
+    _this.ele.addEventListener("touchstart", (e) => {
+      if (!_this._isAnimation) {
+        console.log("touchstart", startX, endX)
+        _this.options.autoPlay && _this.stop()
         const touch = e.targetTouches[0]
         startX = touch.pageX
-        startLeft = this.wrapper.offsetLeft
+        startLeft = _this.wrapper.offsetLeft
       }
     })
-    this.ele.addEventListener("touchmove", (e) => {
-      // console.log(startX, !this._isAnimation)
-      if (startX && !this._isAnimation) {
+    _this.ele.addEventListener("touchmove", (e) => {
+      if (startX && !_this._isAnimation) {
+        console.log("touchmove", startX, endX)
         const touch = e.targetTouches[0]
         endX = touch.pageX
-        this.wrapper.style.left = startLeft + endX - startX + "px"
+        _this.wrapper.style.left = startLeft + endX - startX + "px"
       }
     })
-    this.ele.addEventListener("touchend", (e) => {
-      console.log(endX - startX)
-      if (!this._isAnimation && (endX - startX)) {
-        const move = this.wrapper.offsetLeft - startLeft
-        if (Math.abs(move) > (this._width / 3)) {
-          const width = (this._width) - Math.abs((endX - startX))
-          this._animation((endX - startX) > 0 ? width : width * -1)
+    _this.ele.addEventListener("touchend", (e) => {
+      if (!_this._isAnimation && !!endX && (endX - startX)) {
+        console.log("touchend", endX, startX, Math.abs(endX - startX))
+        const move = _this.wrapper.offsetLeft - startLeft
+        if (Math.abs(move) > (_this._width / 3)) {
+          let width = (_this._width) - Math.abs((endX - startX))
           if (endX - startX > 0) {
-            this._index === 1 ? this._index = this.len : this._index--
+            if (_this._index === 0) {
+              _this.options.loop ? _this._index = _this.len : _this._index = 1
+            } else {
+              _this._index--
+            }
           } else {
-            this._index === this.len ? this._index = 1 : this._index++
+            if (_this._index === _this.len - 1) {
+              _this.options.loop ? _this._index = 1 : _this._index = _this.len
+            } else {
+              _this._index++
+            }
           }
-          this._showBtn()
+          if (_this._index > _this.len || _this._index === 0) width = 0 - Math.abs((endX - startX))
+          _this._animation((endX - startX) > 0 ? width : width * -1)
+          _this._showBtn()
         } else {
-          this._animation(-(endX - startX))
+          _this._animation(-(endX - startX))
         }
         startX = endX = startLeft = null
-        // play()
+        _this.options.autoPlay && _this.play()
       }
     })
 
-    this._handleOptions(options)
+    _this._handleOptions(options)
   }
 
   // 初始化
-  Swiper.prototype._handleOptions = function(options) {
+  Swiper.prototype._handleOptions = function (options) {
     this.options = Object.assign(DEFAULT_OPTIONS, options)
 
     this.options.css = this.options.css && hasTransition
@@ -90,7 +104,7 @@ export default (Swiper) => {
         console.log(e.target.getAttribute("data-index"))
         const num = Number(e.target.getAttribute("data-index"))
         if (!this._isAnimation && Number(num) && this._index !== num) {
-          if (this._index === 1 || this._index === this.len) {
+          if (this.options.loop && (this._index === 1 || this._index === this.len)) {
             if (Math.abs(num - this._index) === this.len - 1) {
               this._animation(-this._width * (this.len - num - this._index) * ((num - this._index) > 0 ? 1 : -1))
             } else {
@@ -100,6 +114,7 @@ export default (Swiper) => {
             this._animation(-this._width * (num - this._index))
           }
           this._index = num
+          this._showBtn()
         }
       })
     }
@@ -125,23 +140,31 @@ export default (Swiper) => {
      * 创建左右箭头
      */
     if (this.options.isArrow) {
-      const fragment = document.createDocumentFragment()
-      const prve = document.createElement("div")
-      const next = document.createElement("div")
+      console.log(isAndroid || isIos)
+      if (isAndroid || isIos) {
+        this.options.isArrow = false
+      } else {
+        const fragment = document.createDocumentFragment()
+        const prve = document.createElement("div")
+        const next = document.createElement("div")
 
-      prve.classList = className(this.options.arrorPrevClass, true)
-      next.classList = className(this.options.arrorNextClass, true)
-      fragment.appendChild(prve)
-      fragment.appendChild(next)
+        prve.classList = className(this.options.arrorPrevClass, true)
+        next.classList = className(this.options.arrorNextClass, true)
+        fragment.appendChild(prve)
+        fragment.appendChild(next)
 
-      this.ele.appendChild(fragment)
+        this.ele.appendChild(fragment)
 
-      prve.addEventListener("click", () => {
-        this.direction("prve")
-      })
-      next.addEventListener("click", () => {
-        this.direction()
-      })
+        prve.addEventListener("click", () => {
+          console.log(111)
+          this.direction("prve")
+        })
+        next.addEventListener("click", () => {
+          this.direction()
+        })
+      }
     }
+
+    this.options.autoPlay && this.play()
   }
 }

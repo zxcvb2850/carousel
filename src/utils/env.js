@@ -1,6 +1,9 @@
 import { warn } from "./debug"
 
 export const inBrowser = (typeof window) !== undefined
+export const ua = inBrowser && navigator.userAgent.toLowerCase()
+export const isAndroid = ua && ua.indexOf("android") > 0
+export const isIos = ua && ua.indexOf("iphone") > 0
 
 export function className(name, type = false) {
   const reg = /(\|\*\?\@\#\$\%\^\&\*\(\))/
