@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>mvvm</title>
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" v-model="msg">
+        <p>{{getValue}}</p>
+        <p v-html="html"></p>
+        <button v-on:click="change">change</button>
+    </div>
+
+    <script src="./src/MVVM.js"></script>
+    <script>
+        const mv = new Vue({
+            el: "#app",
+            data: {
+                msg: "11111111111111",
+                html: "<h1>欢迎光临</h1>"
+            },
+            methods: {
+                change() {
+                    this.html = "<h5>欢迎光临</h5>"
+                },
+                debounce(func) {
+                    let timer
+                    return (...args) => {
+                        clearTimeout(timer)
+                        timer = setTimeout(() => {
+                            func.apply(this, ...args)
+                        }, 300)
+                    }
+                }
+            },
+            computed: {
+                getValue() {
+                    console.log(this.msg)
+                    return Number(this.msg) + 1
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

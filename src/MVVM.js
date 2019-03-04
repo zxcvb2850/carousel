@@ -91,12 +91,12 @@ class Compiler {
   }
   compileElement(node) {
     const attributes = node.attributes
-    attributes && attributes.length && attributes.forEach(attr => {
+    attributes && [...attributes].forEach(attr => {
       const { name, value: expr } = attr
       if (this.isDirective(name)) {
-        const [, directive] = name.split("-")
         const [directiveName, eventName] = name.split(":")
-        CompileUtil[directiveName](node, expr, this.vm, eventName)
+        const [, directive] = directiveName.split("-")
+        CompileUtil[directive](node, expr, this.vm, eventName)
       }
     })
   }
@@ -150,8 +150,7 @@ const CompileUtil = {
   },
   on(node, expr, vm, eventName) {
     node.addEventListener(eventName, (e) => {
-      console.log(vm, expr)
-      // vm[expr].call(vm, e)
+      vm[expr].call(vm, e)
     })
   },
   html(node, expr, vm) {
@@ -164,14 +163,15 @@ const CompileUtil = {
   },
   getContentValue(vm, expr) {
     return expr.replace(/\{\{(.+?)\}\}/, (...args) => {
-      return this.getValue(args[1])
+      return this.getValue(vm, args[1])
     })
   },
   text(node, expr, vm) {
     const fn = this.updater["textUpdater"]
     const content = expr.replace(/\{\{(.+?)\}\}/g, (...args) => {
-      new Watcher(vm, args[1], () => {
+      new Watcher(vm, args[1], (val) => {
         this.getContentValue(vm, expr)
+        fn(node, val)
       })
       return this.getValue(vm, args[1])
     })
@@ -194,13 +194,14 @@ class Vue {
   constructor(options) {
     this.$el = options.el
     this.$data = options.data
-    const computed = options.conputed
+    const computed = options.computed
     const methods = options.methods
 
     if (this.$el) {
       // 监听数据的变化
       new Observer(this.$data)
       this.proxyVm(this.$data)
+      console.log(computed)
       for (const key in computed) {
         Object.defineProperty(this.$data, key, {
           get: () => {

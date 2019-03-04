@@ -1,4 +1,4 @@
-import { inBrowser } from "./env"
+import { inBrowser, isWeChatDevTools } from "./env"
 
 const elementStyle = inBrowser && document.createElement("div").style
 
@@ -48,5 +48,34 @@ export const style = {
   transitionEnd: prefixStyle("transitionEnd")
 }
 
+export const hasTouch = inBrowser && ("ontouchstart" in window || isWeChatDevTools)
 export const hasTransform = transform !== false
 export const hasTransition = inBrowser && transition in elementStyle
+
+export const TOUCH_EVENT = 1
+export const MOUSE_EVENT = 2
+
+export const eventType = {
+  touchstart: TOUCH_EVENT,
+  touchmove: TOUCH_EVENT,
+  touchend: TOUCH_EVENT,
+
+  mousedown: MOUSE_EVENT,
+  mousemove: MOUSE_EVENT,
+  mouseup: MOUSE_EVENT
+}
+
+/* 判断是否是DOM节点 */
+export const isElementNode = (node) => {
+  return node.nodeType === 1
+}
+
+/* 添加事件 */
+export function addEvent(el, type, fn) {
+  el.addEventListener(type, fn)
+}
+
+/* 移除事件 */
+export function removeEvent(el, type, fn) {
+  el.addEventListener(type, fn)
+}

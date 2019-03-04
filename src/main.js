@@ -1,13 +1,15 @@
-import Swiper from "./Swiper"
-import "./common/styles/index.less"
+import Swiper from "./components/Swiper"
+import "./main.less"
 
-new Swiper(".swiper-container", {
+const swiper = new Swiper(".swiper-container", {
   loop: false,
-  autoPlay: true,
+  autoPlay: false,
   speed: 3000,
   click: true,
   isArrow: true,
-  css: false,
+  css: true,
   isPaginat: true,
   swiperWrapClass: "swiper-wrapper"
 })
+
+console.log(swiper)
