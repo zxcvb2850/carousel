@@ -40,11 +40,11 @@ export default (Swiper) => {
     if (!this.slides && !this._len) {
       warn("Need at least one child element as a carousel.")
     }
-    this.wrapper.style.cssText = `position:absolute;width: ${this._width * this._len}px; height: 100%; display: flex`
     this.slides.forEach(slide => {
       slide.style.width = this._width + "px"
     })
 
+    this._addDOMEvents()
     this._handleOptions(options)
   }
   /* 初始化参数 */
@@ -53,11 +53,14 @@ export default (Swiper) => {
     /* 使用css动画 */
     this.options.css = this.options.css && hasTransition
     this.options.isArrow = this.options.isArrow && !(isAndroid || isIos)
-
-    this._addDOMEvents()
+    this.wrapper.style.cssText = `position:absolute;top: 0;left: ${this.options.loop ? -this._width : 0}px;width: ${this._width * this._len}px; height: 100%; display: flex`
   }
 
   Swiper.prototype._addDOMEvents = function () {
+    const eventOperation = addEvent
+    this._handleDOMEvents(eventOperation)
+  }
+  Swiper.prototype._removeDOMEvents = function () {
     const eventOperation = addEvent
     this._handleDOMEvents(eventOperation)
   }
@@ -87,21 +90,13 @@ export default (Swiper) => {
         break
       case "touchmove":
       case "mousemove":
-        if (this.options.zoom && e.touches && e.touches.length > 1) {
-          // this._zoom(e)
-        } else {
-          this._move(e)
-        }
+        this._move(e)
         break
       case "touchend":
       case "mouseup":
       case "touchcancel":
       case "mousecancel":
-        if (this.scaled) {
-          // this._zoomEnd(e)
-        } else {
-          this._end(e)
-        }
+        this._end(e)
         break
       case "transitionend":
       case "webkitTransitionEnd":

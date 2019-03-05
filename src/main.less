@@ -4,6 +4,7 @@
 }
 
 .swiper-container{
+    position: relative;
     width: 100%;
     height: 200px;
     overflow: hidden;
@@ -11,5 +12,13 @@
     
     .swiper-wrapper, .swiper-slide{
         height: 100%;
+    }
+    .swiper-slide{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #000;
+        color: #FFF;
+        font-size: 100px;
     }
 }
