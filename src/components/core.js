@@ -9,10 +9,10 @@ export default (Swiper) => {
     const point = e.touches ? e.touches[0] : e
     this.offsetLeft = this.wrapper.offsetLeft
     this.startX = point.pageX
+    this._isAnimation = true
   }
   /* 拖动中 */
   Swiper.prototype._move = function (e) {
-    if (this.destroyed) return
     const point = e.touches ? e.touches[0] : e
     this.move = point.pageX - this.startX
     this.wrapper.style.left = this.offsetLeft + this.move + "px"
@@ -20,7 +20,6 @@ export default (Swiper) => {
   }
   /* 拖动结束 */
   Swiper.prototype._end = function () {
-    if (this.destroyed) return
     const absMove = Math.abs(this.move)
     const isPositive = this.move > 0 ? 1 : -1
     if (absMove > this._width / 3) {
@@ -37,6 +36,13 @@ export default (Swiper) => {
     } else {
       this.animation(absMove * -isPositive)
     }
+    this._isAnimation = false
+
+    // if (absMove > this._width / 3) {
+    //   console.log(1)
+    // } else {
+    //   this.animation(absMove * -isPositive)
+    // }
   }
   Swiper.prototype._transitionEnd = function (e) {
   }

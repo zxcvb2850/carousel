@@ -16,11 +16,14 @@ export default (Swiper) => {
         requestAnimationFrame(go)
       } else {
         console.log(_this._index)
+        _this._isAnimation = false
         _this.wrapper.style.left = newLeft + "px"
       }
     }
 
-    go()
+    if (this._isAnimation) {
+      go()
+    }
   }
   Swiper.prototype.direction = function () {
   }
