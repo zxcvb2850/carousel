@@ -37,7 +37,6 @@ export default (Swiper) => {
     } else {
       this.animation(absMove * -isPositive)
     }
-    console.log(this._index)
   }
   Swiper.prototype._transitionEnd = function (e) {
   }

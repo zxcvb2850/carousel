@@ -44,8 +44,8 @@ export default (Swiper) => {
       slide.style.width = this._width + "px"
     })
 
-    this._addDOMEvents()
-    this._handleOptions(options)
+    this._addDOMEvents() // 添加绑定事件
+    this._handleOptions(options) // 初始化参数
   }
   /* 初始化参数 */
   Swiper.prototype._handleOptions = function (options) {
@@ -53,7 +53,23 @@ export default (Swiper) => {
     /* 使用css动画 */
     this.options.css = this.options.css && hasTransition
     this.options.isArrow = this.options.isArrow && !(isAndroid || isIos)
-    this.wrapper.style.cssText = `position:absolute;top: 0;left: ${this.options.loop ? -this._width : 0}px;width: ${this._width * this._len}px; height: 100%; display: flex`
+    this.wrapper.style.cssText =
+      `position:absolute;
+      top: 0;
+      left: ${this.options.loop ? -this._width : 0}px;
+      width: ${this.options.loop ? this._width * (this._len + 2) : this._width * this._len}px;
+      height: 100%;
+      display: flex`
+
+    if (this.options.loop) {
+      /**
+       * 如果循环轮播图的话需要将头和尾复制一个节点
+       */
+      const first = this.slides[0]
+      const last = this.slides[this._len - 1]
+      this.wrapper.appendChild(first.cloneNode(true)) // 复制节点并插入节点
+      this.wrapper.insertBefore(last.cloneNode(true), first) // 复制节点插入到第一个
+    }
   }
 
   Swiper.prototype._addDOMEvents = function () {

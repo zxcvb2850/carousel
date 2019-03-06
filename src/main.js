@@ -2,7 +2,7 @@ import Swiper from "./components/Swiper"
 import "./main.less"
 
 const swiper = new Swiper(".swiper-container", {
-  loop: false,
+  loop: true,
   autoPlay: false,
   speed: 3000,
   click: true,
