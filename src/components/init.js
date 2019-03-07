@@ -30,6 +30,7 @@ export default (Swiper) => {
   Swiper.prototype._init = function (options) {
     this._index = 1
     this._timer = null
+    this._isAnimation = false
     this._width = this.el.clientWidth
     this.wrapper = this.el.children[0]
     if (!this.wrapper) {
