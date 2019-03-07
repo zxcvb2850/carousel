@@ -1,5 +1,5 @@
 import { hasTransition, hasTouch, addEvent } from "../utils/dom"
-import { isAndroid, isIos } from "../utils/env"
+import { isAndroid, isIos, className } from "../utils/env"
 import { warn } from "../utils/debug"
 
 const DEFAULT_OPTIONS = {
@@ -70,6 +70,38 @@ export default (Swiper) => {
       const last = this.slides[this._len - 1]
       this.wrapper.appendChild(first.cloneNode(true)) // 复制节点并插入节点
       this.wrapper.insertBefore(last.cloneNode(true), first) // 复制节点插入到第一个
+    }
+    if (this.options.isPaginat) {
+      // 指示器
+      const fragment = document.createDocumentFragment()
+      const pagination = document.createElement("div")
+      pagination.classList.add("swiper-pagination")
+      for (let i = 0; i < this._len; i++) {
+        const span = document.createElement("span")
+        span.classList.add(className(this.options.paginatClass, true))
+        span.setAttribute("data-index", i + 1)
+        pagination.appendChild(span)
+      }
+      this.pagination = pagination
+      fragment.appendChild(pagination)
+      this.el.appendChild(fragment)
+      this.showBtn()
+      addEvent(this.pagination, "touchstart", (e) => {
+        const num = Number(e.target.getAttribute("data-index"))
+        if (!this._isAnimation && Number(num) && this._index !== num) {
+          if (this.options.loop && (this._index === 1 || this._index === this._len)) {
+            if (Math.abs(num - this._index) === this._len - 1) {
+              this.animation(-this._width * (this.len - num - this._index) * ((num - this._index) > 0 ? 1 : -1))
+            } else {
+              this.animation(-this._width * (num - this._index))
+            }
+          } else {
+            this.animation(-this._width * (num - this._index))
+          }
+          this._index = num
+          this.showBtn()
+        }
+      })
     }
   }
 
