@@ -103,6 +103,7 @@ export default (Swiper) => {
         }
       })
     }
+    this.options.autoPlay && this.play()
   }
 
   Swiper.prototype._addDOMEvents = function () {

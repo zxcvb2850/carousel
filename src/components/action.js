@@ -1,6 +1,16 @@
+import { className } from "../utils/env"
+// import { style } from "../utils/dom"
+
 export default (Swiper) => {
   Swiper.prototype.showBtn = function () {
-
+    if (!this.options.isPaginat) return
+    const pageinats = Array.from(document.querySelectorAll(className(this.options.paginatClass)))
+    pageinats.forEach(item => {
+      item.classList.remove("active")
+    })
+    if (this._index > this._len) this._index = this._len
+    if (this._index <= 1) this._index = 1
+    pageinats[this._index - 1].classList.add("active")
   }
   Swiper.prototype.animation = function (offset) {
     this._isAnimation = true
@@ -16,9 +26,8 @@ export default (Swiper) => {
         _this.wrapper.style.left = offsetLeft + speed + "px"
         requestAnimationFrame(go)
       } else {
-        _this.currentIndex(_this._index)
+        _this.currentIndex(newLeft)
         _this._isAnimation = false
-        _this.wrapper.style.left = newLeft + "px"
       }
     }
 
@@ -26,27 +35,28 @@ export default (Swiper) => {
       go()
     }
   }
-  Swiper.prototype.currentIndex = function (index) {
-    if (index === 0) {
-      setTimeout(() => {
-        this._index = this._len
-        this.wrapper.style.left = -this._len * this._width + "px"
-        document.querySelector("#index").innerText = this._index
-      })
-    } else if (index === this._len + 1) {
-      setTimeout(() => {
+  Swiper.prototype.currentIndex = function (newLeft) {
+    if (this.options.loop) {
+      this.wrapper.style.left = newLeft + "px"
+      if (newLeft < -this._width * this._len) {
         this._index = 1
         this.wrapper.style.left = -this._width + "px"
-        document.querySelector("#index").innerText = this._index
-      })
+      } else if (newLeft > -this._width) {
+        this._index = this._len
+        this.wrapper.style.left = -this._width * this._len + "px"
+      }
     } else {
-      document.querySelector("#index").innerText = index
+      this.wrapper.style.left = newLeft + "px"
     }
+    this.showBtn()
+    document.querySelector("#index").innerText = this._index
   }
   Swiper.prototype.direction = function () {
   }
   Swiper.prototype.play = function () {
+    this._timer = setInterval(() => this._next(), this.options.speed)
   }
   Swiper.prototype.stop = function () {
+    clearInterval(this._timer)
   }
 }

@@ -4,6 +4,7 @@ export default (Swiper) => {
   /* 拖动开始 */
   Swiper.prototype._start = function (e) {
     if (!this._isAnimation) {
+      this.stop()
       const _eventType = eventType[e.type]
       if (this.destroyed || (this.initiated && this.initiated !== _eventType)) return
       this.initiated = _eventType
@@ -26,20 +27,6 @@ export default (Swiper) => {
     if (!this._isAnimation && !!this.endX && (this.endX - this.startX)) {
       const absMove = Math.abs(this.move)
       const isPositive = this.move > 0 ? 1 : -1
-      /* if (absMove > this._width / 3) {
-        isPositive > 0 ? this._index-- : this._index++
-        if (this._index < 1) {
-          this._index = 1
-          this.animation(absMove * -isPositive)
-        } else if (this._index > this._len) {
-          this._index = this._len
-          this.animation(absMove * -isPositive)
-        } else {
-          this.animation((this._width - absMove) * isPositive)
-        }
-      } else {
-        this.animation(absMove * -isPositive)
-      } */
       if (absMove > this._width / 3) {
         isPositive > 0 ? this._index-- : this._index++
         if (!this.options.loop && this._index < 1) {
@@ -55,10 +42,31 @@ export default (Swiper) => {
         this.animation(absMove * -isPositive)
       }
       this.startX = this.endX = null
+      this.play()
     }
   }
   Swiper.prototype._transitionEnd = function (e) {
     console.log("_transitionEnd", e)
+  }
+  Swiper.prototype._next = function () {
+    if (this.options.loop) {
+      this._index === this._len ? this._index = 1 : this._index++
+    } else {
+      if (this._index <= this._len) {
+        this._index++
+      }
+      if (this._index < this._len + 1) {
+        this.animation(this._width * -1)
+      }
+    }
+    console.log("+++++++++", this._index)
+    this.options.loop && this.animation(this._width * -1)
+    this.showBtn()
+  }
+  Swiper.prototype._prev = function () {
+    this.index--
+    this.showBtn()
+    console.log("----------", this._index)
   }
   /* 移除事件 */
   Swiper.prototype.destroy = function () {

@@ -3,7 +3,7 @@ import "./main.less"
 
 const swiper = new Swiper(".swiper-container", {
   loop: true,
-  autoPlay: false,
+  autoPlay: true,
   speed: 3000,
   click: true,
   isArrow: true,
