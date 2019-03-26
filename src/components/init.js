@@ -1,4 +1,4 @@
-import { hasTransition, hasTouch, addEvent } from "../utils/dom"
+import { hasTransition, hasTouch, addEvent, style } from "../utils/dom"
 import { isAndroid, isIos, className } from "../utils/env"
 import { warn } from "../utils/debug"
 
@@ -11,6 +11,8 @@ const DEFAULT_OPTIONS = {
   speed: 3000,
   /* 是否使用trans */
   css: true,
+  /* 动画速度 */
+  cssSpeed: "all 0.35s",
   /* 能否点击轮播 */
   click: false,
   /* 是否有箭头 */
@@ -62,6 +64,9 @@ export default (Swiper) => {
       height: 100%;
       display: flex`
 
+    /**
+     * 循环滚动
+     * */
     if (this.options.loop) {
       /**
        * 如果循环轮播图的话需要将头和尾复制一个节点
@@ -71,8 +76,10 @@ export default (Swiper) => {
       this.wrapper.appendChild(first.cloneNode(true)) // 复制节点并插入节点
       this.wrapper.insertBefore(last.cloneNode(true), first) // 复制节点插入到第一个
     }
+    /**
+     * 创建指示器
+     * */
     if (this.options.isPaginat) {
-      // 指示器
       const fragment = document.createDocumentFragment()
       const pagination = document.createElement("div")
       pagination.classList.add("swiper-pagination")
@@ -103,6 +110,15 @@ export default (Swiper) => {
         }
       })
     }
+    /**
+     * 允许或支持css3默认使用css3动画
+     * */
+    if (this.options.css) {
+      this.wrapper.style[style.transition] = "all 0.35s"
+    }
+    /**
+     * 自动播放
+     * */
     this.options.autoPlay && this.play()
   }
 

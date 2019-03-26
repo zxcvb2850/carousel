@@ -77,5 +77,9 @@ export function addEvent(el, type, fn) {
 
 /* 移除事件 */
 export function removeEvent(el, type, fn) {
-  el.addEventListener(type, fn)
+  el.removeEventListener(type, fn)
+}
+
+export function transitionAnimate (el, action) {
+  el.style[style.transition] = action
 }
