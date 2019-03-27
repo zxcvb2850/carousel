@@ -1,7 +1,9 @@
 import { eventType, transitionAnimate } from "../utils/dom"
 
 export default (Swiper) => {
-  /* 拖动开始 */
+  /**
+   * 拖动开始
+   * */
   Swiper.prototype._start = function (e) {
     if (!this._isAnimation) {
       this.options.autoPlay && this.stop()
@@ -14,7 +16,9 @@ export default (Swiper) => {
       this.options.css && transitionAnimate(this.wrapper, "none")
     }
   }
-  /* 拖动中 */
+  /**
+   * 拖动中
+   * */
   Swiper.prototype._move = function (e) {
     if (!this._isAnimation && this.startX) {
       const point = e.touches ? e.touches[0] : e
@@ -23,14 +27,15 @@ export default (Swiper) => {
       this.endX = point.pageX
     }
   }
-  /* 拖动结束 */
+  /**
+   * 拖动结束
+   * */
   Swiper.prototype._end = function () {
     if (!this._isAnimation && !!this.endX && (this.endX - this.startX)) {
       const absMove = Math.abs(this.move)
       const isPositive = this.move > 0 ? 1 : -1
       if (absMove > this._width / 3) {
         isPositive > 0 ? this._index-- : this._index++
-        console.log("---------", this._index)
         if (!this.options.loop && this._index < 1) {
           this._index = 1
           this.animation(absMove * -isPositive)
@@ -49,9 +54,13 @@ export default (Swiper) => {
     }
   }
   Swiper.prototype._transitionEnd = function (e) {
-    console.log("_transitionEnd", e)
+    // console.log("_transitionEnd", e)
   }
-  Swiper.prototype._next = function () {
+  /**
+   * 下一页
+   * */
+  Swiper.prototype.next = function () {
+    if (this._isAnimation) return
     if (this.options.loop) {
       if (!this.options.css) {
         this._index === this._len ? this._index = 1 : this._index++
@@ -59,20 +68,40 @@ export default (Swiper) => {
         this._index === this._len + 1 ? this._index = 1 : this._index++
       }
     } else {
-      if (this._index <= this._len) {
-        this._index++
-      }
-      if (this._index < this._len + 1) {
-        this.animation(this._width * -1)
+      if (this._index < this._len) {
+        if (this._index <= this._len) {
+          this._index++
+        }
+        if (this._index < this._len + 1) {
+          this.animation(this._width * -1)
+        }
       }
     }
-    console.log("+++++++", this._index, this._width * -1)
+    this.options.css && transitionAnimate(this.wrapper, this.options.cssSpeed)
     this.options.loop && this.animation(this._width * -1)
-    this.showBtn()
   }
-  Swiper.prototype._prev = function () {
-    this.index--
-    this.showBtn()
+  /**
+   * 上一页
+   * */
+  Swiper.prototype.prev = function () {
+    if (this.options.loop) {
+      if (!this.options.css) {
+        this._index === 0 ? this._index = this._len : this._index--
+      } else {
+        this._index === 0 ? this._index = this._len : this._index--
+      }
+    } else {
+      if (this._index > 1) {
+        if (this._index > 1) {
+          this._index--
+        }
+        if (this._index < this._len + 1) {
+          this.animation(-this._width * -1)
+        }
+      }
+    }
+    this.options.css && transitionAnimate(this.wrapper, this.options.cssSpeed)
+    this.options.loop && this.animation(-this._width * -1)
   }
   /* 移除事件 */
   Swiper.prototype.destroy = function () {

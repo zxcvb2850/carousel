@@ -15,6 +15,8 @@ const DEFAULT_OPTIONS = {
   cssSpeed: "all 0.35s",
   /* 能否点击轮播 */
   click: false,
+  /* 点击反馈 */
+  clickCallback: null,
   /* 是否有箭头 */
   isArrow: false,
   /* 箭头的calssName */
@@ -24,7 +26,9 @@ const DEFAULT_OPTIONS = {
   slideClass: ".swiper-slide",
   /* 指示器 */
   isPaginat: false,
-  paginatClass: ".swiper-pagination-bullet"
+  paginatClass: ".swiper-pagination-bullet",
+  /* 监听轮播图改变 */
+  changeCurrIndex: null
 }
 
 export default (Swiper) => {
@@ -120,6 +124,43 @@ export default (Swiper) => {
      * 自动播放
      * */
     this.options.autoPlay && this.play()
+    /**
+     * 监听是否在当前页签
+     * */
+    if (this.options.loop) {
+      // 各种浏览器兼容
+      let state = null
+      let visibilityChange = null
+      if (typeof document.hidden !== "undefined") {
+        visibilityChange = "visibilitychange"
+        state = "visibilityState"
+      } else if (typeof document.mozHidden !== "undefined") {
+        visibilityChange = "mozvisibilitychange"
+        state = "mozVisibilityState"
+      } else if (typeof document.msHidden !== "undefined") {
+        visibilityChange = "msvisibilitychange"
+        state = "msVisibilityState"
+      } else if (typeof document.webkitHidden !== "undefined") {
+        visibilityChange = "webkitvisibilitychange"
+        state = "webkitVisibilityState"
+      }
+      // 添加监听器，在title里显示状态变化
+      addEvent(document, visibilityChange, () => {
+        const status = document[state]
+        if (status === "hidden") {
+          this.stop()
+        }
+        if (status === "visible") {
+          this.play()
+        }
+      })
+    }
+    /**
+     * 点击单个item
+     * */
+    addEvent(this.wrapper, "click", (e) => {
+      this.options.clickCallback && this.options.clickCallback(e, this._index)
+    })
   }
 
   Swiper.prototype._addDOMEvents = function () {
